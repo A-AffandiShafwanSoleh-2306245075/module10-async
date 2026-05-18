@@ -117,6 +117,9 @@ fn main() {
         TimerFuture::new(Duration::new(2, 0)).await;
         println!("Affandi's Komputer: done!");
     });
+
+    println!("2306245075's Komputer: hey hey!");
+
     drop(spawner);
     executor.run();
 }
