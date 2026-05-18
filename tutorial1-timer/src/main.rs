@@ -118,8 +118,20 @@ fn main() {
         println!("Affandi's Komputer: done!");
     });
 
-    println!("2306245075's Komputer: hey hey!");
+    spawner.spawn(async {
+        println!("Affandi's Komputer: howdy2!");
+        TimerFuture::new(Duration::new(2, 0)).await;
+        println!("Affandi's Komputer: done2!");
+    });
 
-    drop(spawner);
+    spawner.spawn(async {
+        println!("Affandi's Komputer: howdy3!");
+        TimerFuture::new(Duration::new(2, 0)).await;
+        println!("Affandi's Komputer: done3!");
+    });
+
+    println!("Affandi's Komputer: hey hey!");
+
+    //drop(spawner);
     executor.run();
 }
