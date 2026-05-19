@@ -848,3 +848,85 @@ sehingga pesan dari WebSocket dapat diteruskan ke komponen Chat secara reaktif.
 
 *Halaman chat setelah login. Sidebar kiri menampilkan daftar user yang online,
 area kanan menampilkan pesan yang sudah dikirim.*
+
+
+## Experiment 3.2: Be Creative!
+ 
+### Ide Kreatif — Tema Frutiger Aero
+ 
+Untuk eksperimen ini, saya memilih untuk mengubah tampilan YewChat dengan tema **Frutiger Aero** —
+estetika desain populer era 2000-an yang identik dengan warna biru langit, efek kaca frosted glass,
+gradien glossy, dan orb-orb dekoratif yang mengambang. Tema ini memberikan nuansa segar, bersih,
+dan futuristik yang berbeda dari tampilan chat biasa.
+ 
+Menurut World Economic Forum, kreativitas adalah salah satu kemampuan paling penting untuk bersaing
+Saya mencoba menggabungkan kreativitas visual dengan kemampuan teknis pemrograman Rust dan Yew.
+ 
+---
+ 
+### Perubahan yang Dilakukan
+ 
+#### 1. Halaman Login (`src/components/login.rs`)
+ 
+- Mengganti background gelap menjadi **gradien biru langit** (`#a8d8f0` → `#e8f7ff`) khas Frutiger Aero
+- Menambahkan **orb dekoratif** transparan di sudut-sudut halaman menggunakan `radial-gradient` dan `blur`
+- Card login menggunakan efek **frosted glass** dengan `backdrop-filter: blur(20px)` dan background semi-transparan
+- Menambahkan **logo orb glossy** di atas form dengan efek radial gradient 3D
+- Mengubah judul menjadi **"AeroChat"** dengan warna biru dalam
+- Input dan tombol menggunakan border-radius `50px` (pill shape) khas desain era tersebut
+- Tombol GO! menggunakan **gradien biru glossy** dengan efek shadow
+#### 2. Halaman Chat (`src/components/chat.rs`)
+ 
+- Background utama menggunakan **gradien biru langit multi-arah** agar terasa seperti langit cerah
+- Sidebar menggunakan efek **frosted glass** dengan `backdrop-filter: blur(16px)`
+- Setiap card user di sidebar menggunakan **gradien putih-biru** dengan border putih dan shadow halus
+- Status user diubah dari "Hi there!" menjadi **"🟢 Online"**
+- Header chat menggunakan efek frosted glass dengan gradien horizontal
+- Bubble pesan menggunakan **efek kaca** dengan border putih, shadow biru halus, dan border-radius asimetris
+- Input pesan berbentuk pill dengan background semi-transparan
+- Tombol kirim menggunakan **orb glossy biru** dengan radial gradient 3D
+---
+ 
+### Alasan Pemilihan Tema
+ 
+Frutiger Aero dipilih karena:
+1. **Kontras visual yang kuat** — tampilan berbeda dari chat app kebanyakan yang dark mode
+2. **Estetika yang nostalgik sekaligus segar** — mengingatkan era Windows Vista/7
+3. **Tantangan teknis** — mengimplementasikan frosted glass, gradien kompleks, dan orb dekoratif menggunakan inline CSS di Yew cukup menantang karena Tailwind tidak mendukung semua properti CSS advanced
+4. **Identitas personal** — tema ini mencerminkan selera desain yang unik dan tidak generik
+---
+ 
+### Cara Menjalankan
+ 
+```powershell
+# Terminal 1 - Server
+cd tutorial3-webchat\tutorial3-webchat-server
+npm start
+ 
+# Terminal 2 - Frontend (pastikan Rust 1.77.0)
+rustup default 1.77.0
+cd tutorial3-webchat\tutorial3-webchat
+npm start
+```
+ 
+Buka browser ke `http://localhost:8000`
+ 
+---
+ 
+### Hasil Percobaan
+ 
+- Halaman login menampilkan background biru langit dengan orb-orb mengambang
+- Card login menggunakan efek frosted glass semi-transparan
+- Logo orb glossy biru di atas form memberikan kesan 3D
+- Halaman chat memiliki sidebar frosted glass dengan card user bergaya glossy
+- Bubble pesan menggunakan efek kaca dengan shadow biru halus
+- Keseluruhan tampilan memberikan nuansa Frutiger Aero yang segar dan berbeda
+### Screenshot
+ 
+![Login Page](assets/screenshot-3.2-login.png)
+ 
+*Halaman login dengan tema Frutiger Aero — background biru langit, orb dekoratif, dan card frosted glass.*
+ 
+![Chat Page](assets/screenshot-3.2-chat.png)
+ 
+*Halaman chat dengan sidebar frosted glass, bubble pesan bergaya kaca, dan tombol orb glossy biru.*
