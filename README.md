@@ -930,3 +930,141 @@ Buka browser ke `http://localhost:8000`
 ![Chat Page](assets/screenshot-3.2-chat.png)
  
 *Halaman chat dengan sidebar frosted glass, bubble pesan bergaya kaca, dan tombol orb glossy biru.*
+
+
+## Bonus: Rust Websocket Server for YewChat!
+
+### Deskripsi
+
+Pada bagian bonus ini, saya mengganti WebSocket server JavaScript (TypeScript)
+dari Tutorial 3 dengan server Rust yang dimodifikasi dari Tutorial 2.
+Tantangannya adalah menyesuaikan format komunikasi karena YewChat menggunakan
+JSON, sedangkan server Tutorial 2 awalnya hanya mengirim plain text.
+
+---
+
+### Perbedaan Format Pesan
+
+#### Server Tutorial 2 (plain text)
+```
+hello
+hai kamu
+```
+
+#### YewChat (JSON)
+```json
+// Client → Server (register)
+{"messageType":"register","data":"Affandi"}
+
+// Client → Server (pesan)
+{"messageType":"message","data":"Halo Boro"}
+
+// Server → Client (daftar users)
+{"messageType":"users","dataArray":["Affandi","Boro"]}
+
+// Server → Client (pesan broadcast)
+{"messageType":"message","data":"{\"from\":\"Affandi\",\"message\":\"Halo Boro\"}"}
+```
+
+Meskipun formatnya berbeda, keduanya tetap dikirim sebagai **satu text message**
+melalui WebSocket. JSON hanya di-serialize menjadi string teks biasa, sehingga
+protokol WebSocket-nya tetap sama — yang berubah hanya isi pesannya.
+
+---
+
+### Perubahan pada Server Rust (Tutorial 2)
+
+#### `Cargo.toml` — Tambah dependency serde
+```toml
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4"
+```
+
+#### `src/bin/server.rs` — Perubahan utama:
+
+1. **Tambah struct untuk parsing JSON** — `IncomingMessage`, `OutgoingUsers`,
+   `OutgoingMessage`, dan `MessageData` untuk handle format pesan YewChat
+
+2. **Tambah `UserMap`** — `HashMap<SocketAddr, String>` yang dibungkus
+   `Arc<Mutex<>>` untuk menyimpan username setiap client yang terhubung
+   secara thread-safe
+
+3. **Handle dua jenis pesan masuk:**
+   - `register` → simpan username ke map, broadcast daftar user terbaru ke semua client
+   - `message` → ambil username pengirim dari map, broadcast pesan beserta info pengirim
+
+4. **Handle disconnect** — saat client putus, hapus dari map dan broadcast
+   ulang daftar user yang tersisa
+
+---
+
+### Cara Menjalankan
+
+```powershell
+# Pastikan Rust 1.77.0 untuk kompatibilitas
+rustup default 1.77.0
+
+# Terminal 1 - Jalankan Rust server (bukan JS server)
+cd tutorial2-broadcast
+cargo run --bin server
+
+# Terminal 2 - Jalankan YewChat frontend
+cd tutorial3-webchat\tutorial3-webchat
+npm start
+```
+
+Buka browser ke `http://localhost:8000`
+
+---
+
+### Mengapa Berhasil?
+
+Perubahan ini berhasil karena YewChat pada dasarnya hanya mengirim dan menerima
+**string teks biasa** melalui WebSocket — hanya saja string tersebut berformat JSON.
+Server Rust Tutorial 2 sudah bisa handle WebSocket text message, jadi yang perlu
+dilakukan hanyalah menambahkan logika parsing dan formatting JSON di sisi server.
+
+Kuncinya adalah:
+- `serde_json::from_str()` untuk parse JSON yang masuk dari client
+- `serde_json::to_string()` untuk serialize response sebelum dikirim
+- `Arc<Mutex<HashMap>>` untuk menyimpan state user secara concurrent dan thread-safe
+
+---
+
+### Hasil Percobaan
+
+- Server Rust berhasil menerima koneksi dari dua client sekaligus (Affandi dan Boro)
+- Kedua user muncul di sidebar **Online Users** dengan status 🟢 Online
+- Affandi mengirim "Halo Boro" → diterima oleh Boro
+- Boro membalas "Halo Affandi" → diterima oleh Affandi
+- Percakapan berlanjut dengan "Apa kabar" dan "Baik" — semua pesan berhasil
+  dikirim dan diterima melalui Rust WebSocket server
+
+### Screenshot
+
+![Tab Affandi](assets/screenshot-bonus-1.png)
+
+*Tab Affandi — menampilkan percakapan lengkap antara Affandi dan Boro melalui Rust server*
+
+![Tab Boro](assets/screenshot-bonus-2.png)
+
+*Tab Boro — menerima semua pesan dari Affandi dan berhasil membalas*
+
+---
+
+### Pendapat: JavaScript vs Rust
+
+**JavaScript/TypeScript** lebih mudah untuk disetup dan dikembangkan dengan cepat.
+Ekosistem npm yang lengkap, sintaks yang familiar, dan tidak perlu memikirkan
+tipe data secara ketat membuat prototyping jauh lebih cepat.
+
+**Rust** lebih unggul dalam hal performa dan keamanan memori. Server Rust tidak
+membutuhkan garbage collector, lebih efisien dalam menangani banyak koneksi
+bersamaan, dan compiler Rust memastikan tidak ada data race atau memory leak.
+Namun setup-nya lebih kompleks, terutama karena masalah kompatibilitas versi
+seperti yang dialami di tutorial ini.
+
+Untuk production dengan beban tinggi, saya lebih memilih **Rust** karena
+keamanan dan efisiensinya. Namun untuk pengembangan cepat dan prototyping,
+**JavaScript/TypeScript** tetap lebih praktis dan mudah.
